@@ -1,3 +1,3 @@
-module github.com/Grand-Theft-Auto-In-CCNU-MUX/hacker-support
+module github.com/Grand-Theft-Auto-In-CCNU-MUXI/hacker-support
 
 go 1.17
