@@ -113,7 +113,7 @@ func NewRequest(method, url, body, bodyType string) (req *Request, err error) {
 	return
 }
 
-func SentRequest(request http.Request) (response *HttpResponse, err error) {
+func SendRequest(request http.Request) (response *HttpResponse, err error) {
 	client := http.Client{}
 	response.raw, err = client.Do(&request)
 	if err != nil {
