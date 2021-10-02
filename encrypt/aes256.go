@@ -25,7 +25,6 @@ func AESDecode(data []byte, key []byte) ([]byte, error) {
 	return origData[:(length - unpadding)], nil
 }
 
-
 // AESEncrypt str with AES256-CBC, padding with PKCS7
 func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 	ivT := make([]byte, aes.BlockSize+len(plaintext))
@@ -49,4 +48,28 @@ func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 	blockMode.CryptBlocks(crypted, plaintext)
 
 	return crypted, nil
+}
+
+// Use the AESEncrypt and output in Base64
+func AESEncryptOutInBase64(plaintext []byte, key []byte) ([]byte, error) {
+	content, err := AESEncrypt(plaintext, key)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return []byte(Base64Encode(content)), nil
+}
+
+func AESDecodeAfterBase64(data []byte, key []byte) ([]byte, error) {
+	content, err := Base64Decode(string(data))
+	if err != nil {
+		return []byte{}, err
+	}
+
+	plainText, err := AESDecode([]byte(content), key)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return plainText, nil
 }
