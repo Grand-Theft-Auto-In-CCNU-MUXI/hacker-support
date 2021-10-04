@@ -1,6 +1,7 @@
 package httptool
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -38,22 +39,21 @@ func (r *HttpResponse) ShowBody() {
 
 // ShowHeader ... 输出 response header
 func (r *HttpResponse) ShowHeader() {
-	header := make(map[string][]string)
 	for key, value := range r.raw.Header {
-		if key == "code" {
-		} else {
-			header[key] = value
+		if key != "code" {
+			for _, v := range value {
+				fmt.Println(key + " : " + v)
+			}
 		}
 	}
-	fmt.Println(header)
 }
 
 // GetHeader ... 获取请求头
-func (r *HttpResponse) GetHeader(key string) ([]string,error) {
+func (r *HttpResponse) GetHeader(key string) ([]string, error) {
 	if key == "" {
-		return nil,errors.New("GetHeader Err : key is invalid")
+		return nil, errors.New("GetHeader Err : key is invalid")
 	}
-	return r.raw.Header.Values(key),nil
+	return r.raw.Header.Values(key), nil
 }
 
 // DownloadFile ... 下载文件
@@ -62,10 +62,12 @@ func DownloadFile(r *HttpResponse, path string) (err error) {
 		return errors.New("path is invalid")
 	}
 
-	imageBytes := r.Body.Data.ExtraInfo
+	imageBytes, err := base64.StdEncoding.DecodeString(r.Body.Data.ExtraInfo)
+	if err != nil {
+		return err
+	}
 
-	err = ioutil.WriteFile(path, []byte(imageBytes), 0777)
-
+	err = ioutil.WriteFile(path, imageBytes, 0777)
 	if err != nil {
 		return err
 	}
