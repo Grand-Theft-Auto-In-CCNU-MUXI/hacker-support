@@ -56,15 +56,14 @@ func (r *HttpRequest) ShowBody() {
 
 // ShowHeader ... 打印请求 header
 func (r *HttpRequest) ShowHeader() {
-	header := make(map[string][]string)
+	fmt.Println("request header:")
 	for key, value := range r.Req.Header {
-		if key == "code" {
-		} else {
-			header[key] = value
+		if key != "code" {
+			for _, v := range value {
+				fmt.Println(key + " : " + v)
+			}
 		}
 	}
-	// TODO: 格式化输出
-	fmt.Println(header)
 }
 
 // AddHeader ... 增加请求头
@@ -89,12 +88,12 @@ func (r *HttpRequest) SetHeader(key string, value string) {
 // bodyType has two choice `file` or `default`
 func NewRequest(method, url, body string, bodyType int) (req *HttpRequest, err error) {
 	if bodyType == FILE {
-		req, err = handleFile(url,body)
+		req, err = handleFile(url, body)
 		if err != nil {
 			return nil, err
 		}
 	} else if bodyType == DEFAULT {
-		req,err = handleDefault(method,url,body)
+		req, err = handleDefault(method, url, body)
 		if err != nil {
 			return nil, err
 		}
@@ -103,7 +102,7 @@ func NewRequest(method, url, body string, bodyType int) (req *HttpRequest, err e
 	}
 
 	userName := os.Getenv("USERNAME")
-	if userName == ""{
+	if userName == "" {
 		userName = os.Getenv("USER")
 	}
 	req.AddHeader("code", userName)
@@ -112,7 +111,7 @@ func NewRequest(method, url, body string, bodyType int) (req *HttpRequest, err e
 }
 
 // SendRequest ... 发送消息，根据状态码输出提示
-func SendRequest(request *HttpRequest) (*HttpResponse,error) {
+func SendRequest(request *HttpRequest) (*HttpResponse, error) {
 	response := new(HttpResponse)
 	var err error
 	client := &http.Client{}
@@ -124,28 +123,29 @@ func SendRequest(request *HttpRequest) (*HttpResponse,error) {
 	if response.raw.StatusCode == 200 {
 		err = ResolveResponse(response)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
-		fmt.Println("request success the data is: ")
-		fmt.Println(response.Body.Data.Text)
-		fmt.Println("the Extra info is: ")
-		fmt.Println(response.Body.Data.ExtraInfo)
+		fmt.Println("send request successfully! please check your response body")
+		//fmt.Println("request success the data is: ")
+		//fmt.Println(response.Body.Data.Text)
+		//fmt.Println("the Extra info is: ")
+		//fmt.Println(response.Body.Data.ExtraInfo)
 	} else {
 		body, err := ioutil.ReadAll(response.raw.Body)
 		if err != nil {
 			fmt.Println("read body error" + err.Error())
 			return nil, err
 		}
-		if response.raw.StatusCode == 401 {
-			fmt.Println("failed! the wrong data is: ")
+		if response.raw.StatusCode == 400 {
+			fmt.Println("http 400 failed! the wrong data is: ")
 			fmt.Println(string(body))
 			return response, nil
 		} else if response.raw.StatusCode == 404 {
-			fmt.Println("we can not find the path, did you input the right information? the wrong message is: ")
+			fmt.Println("http 404. we can not find the path, did you input the right information? the wrong message is: ")
 			fmt.Println(string(body))
 			return response, nil
 		} else if response.raw.StatusCode == 500 {
-			fmt.Println("server error, message: ")
+			fmt.Println("http 500. server error, message: ")
 			fmt.Println(string(body))
 		}
 	}
@@ -153,7 +153,7 @@ func SendRequest(request *HttpRequest) (*HttpResponse,error) {
 	return response, nil
 }
 
-func handleFile(url,path string)(*HttpRequest,error){
+func handleFile(url, path string) (*HttpRequest, error) {
 	req := new(HttpRequest)
 	req.BodyType = FILE
 
@@ -161,7 +161,7 @@ func handleFile(url,path string)(*HttpRequest,error){
 	writer := multipart.NewWriter(payload)
 	file, errFile := os.Open(path)
 	if errFile != nil {
-		return nil,errFile
+		return nil, errFile
 	}
 
 	defer func(file *os.File) {
@@ -173,12 +173,12 @@ func handleFile(url,path string)(*HttpRequest,error){
 
 	part1, errFile := writer.CreateFormFile("file", filepath.Base(path))
 	if errFile != nil {
-		return nil,errFile
+		return nil, errFile
 	}
 
 	_, errFile = io.Copy(part1, file)
 	if errFile != nil {
-		return nil,errFile
+		return nil, errFile
 	}
 
 	err := writer.Close()
@@ -193,10 +193,10 @@ func handleFile(url,path string)(*HttpRequest,error){
 
 	req.SetHeader("Content-Type", writer.FormDataContentType())
 
-	return req,nil
+	return req, nil
 }
 
-func handleDefault(method,url,body string)(*HttpRequest,error){
+func handleDefault(method, url, body string) (*HttpRequest, error) {
 	req := new(HttpRequest)
 	req.BodyType = DEFAULT
 	myBody := Request{
@@ -226,5 +226,5 @@ func handleDefault(method,url,body string)(*HttpRequest,error){
 
 	req.AddHeader("Content-Type", "application/json")
 
-	return req,nil
+	return req, nil
 }
