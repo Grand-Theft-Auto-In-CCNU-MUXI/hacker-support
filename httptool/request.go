@@ -125,7 +125,7 @@ func SendRequest(request *HttpRequest) (*HttpResponse, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("send request successfully! please check your response body")
+		fmt.Println("Send request successfully! Please check your response body.")
 		//fmt.Println("request success the data is: ")
 		//fmt.Println(response.Body.Data.Text)
 		//fmt.Println("the Extra info is: ")

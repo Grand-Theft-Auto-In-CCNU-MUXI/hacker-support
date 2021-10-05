@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type TextInfo struct {
@@ -23,12 +24,18 @@ type Response struct {
 
 type HttpResponse struct {
 	Body Response `json:"body"`
+	Raw  string
 	raw  *http.Response
 }
 
 // ShowBody ... 输出 response body
 // TODO: 美化输出
 func (r *HttpResponse) ShowBody() {
+	if len(r.Raw) != 0 {
+		fmt.Println("Body:")
+		fmt.Println(r.Raw)
+	}
+
 	fmt.Println("Message:")
 	fmt.Println(r.Body.Message)
 	fmt.Println("Text:")
@@ -91,11 +98,14 @@ func ResolveResponse(response *HttpResponse) (err error) {
 		return
 	}
 
-	err = json.Unmarshal(body, &response.Body)
-	if err != nil {
-		return
+	if strings.Contains(response.raw.Header.Get("Content-Type"), "application/json") {
+		err = json.Unmarshal(body, &response.Body)
+		if err != nil {
+			return
+		}
+	} else {
+		response.Raw = string(body)
 	}
 
 	return
-
 }
