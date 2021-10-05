@@ -7,7 +7,7 @@ import (
 )
 
 // DecodeAES decode data with aes-256/CBC/PKCS7
-func AESDecode(data []byte, key []byte) ([]byte, error) {
+func aseDecode(data []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -25,8 +25,8 @@ func AESDecode(data []byte, key []byte) ([]byte, error) {
 	return origData[:(length - unpadding)], nil
 }
 
-// AESEncrypt str with AES256-CBC, padding with PKCS7
-func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {
+// aseEncrypt str with AES256-CBC, padding with PKCS7
+func aseEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 	ivT := make([]byte, aes.BlockSize+len(plaintext))
 	// initialization vector
 	iv := ivT[:aes.BlockSize]
@@ -50,9 +50,9 @@ func AESEncrypt(plaintext []byte, key []byte) ([]byte, error) {
 	return crypted, nil
 }
 
-// Use the AESEncrypt and output in Base64
+// AESEncryptOutInBase64 Use the aseEncrypt and output in Base64 加密
 func AESEncryptOutInBase64(plaintext []byte, key []byte) ([]byte, error) {
-	content, err := AESEncrypt(plaintext, key)
+	content, err := aseEncrypt(plaintext, key)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -60,13 +60,14 @@ func AESEncryptOutInBase64(plaintext []byte, key []byte) ([]byte, error) {
 	return []byte(Base64Encode(content)), nil
 }
 
+// AESDecodeAfterBase64 ... 解密
 func AESDecodeAfterBase64(data []byte, key []byte) ([]byte, error) {
 	content, err := Base64Decode(string(data))
 	if err != nil {
 		return []byte{}, err
 	}
 
-	plainText, err := AESDecode([]byte(content), key)
+	plainText, err := aseDecode([]byte(content), key)
 	if err != nil {
 		return []byte{}, err
 	}
