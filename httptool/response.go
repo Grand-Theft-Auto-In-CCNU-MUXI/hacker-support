@@ -29,16 +29,18 @@ type HttpResponse struct {
 // ShowBody ... 输出 response body
 // TODO: 美化输出
 func (r *HttpResponse) ShowBody() {
-	fmt.Println("Message:")
+	fmt.Println("response body:")
+	fmt.Println("1.Message:")
 	fmt.Println(r.Body.Message)
-	fmt.Println("Text:")
+	fmt.Println("2.Text:")
 	fmt.Println(r.Body.Data.Text)
-	fmt.Println("ExtraInfo:")
+	fmt.Println("3.ExtraInfo:")
 	fmt.Println(r.Body.Data.ExtraInfo)
 }
 
 // ShowHeader ... 输出 response header
 func (r *HttpResponse) ShowHeader() {
+	fmt.Println("response header:")
 	for key, value := range r.raw.Header {
 		if key != "code" {
 			for _, v := range value {
