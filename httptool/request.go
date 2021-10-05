@@ -137,18 +137,20 @@ func (r *HttpRequest) SendRequest() (*HttpResponse, error) {
 			fmt.Println("read body error" + err.Error())
 			return nil, err
 		}
+
 		if response.raw.StatusCode == 400 {
 			fmt.Println("http 400 failed! the wrong data is: ")
 			fmt.Println(string(body))
-			return response, nil
 		} else if response.raw.StatusCode == 404 {
 			fmt.Println("http 404. we can not find the path, did you input the right information? the wrong message is: ")
 			fmt.Println(string(body))
-			return response, nil
 		} else if response.raw.StatusCode == 500 {
 			fmt.Println("http 500. server error, message: ")
 			fmt.Println(string(body))
 		}
+		response.Raw = string(body)
+
+		return response, nil
 	}
 
 	return response, nil

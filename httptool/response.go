@@ -34,6 +34,7 @@ func (r *HttpResponse) ShowBody() {
 	if len(r.Raw) != 0 {
 		fmt.Println("Body:")
 		fmt.Println(r.Raw)
+		return
 	}
 
 	fmt.Println("Message:")
