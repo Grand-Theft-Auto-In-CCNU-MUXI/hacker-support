@@ -8,7 +8,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/matishsiao/goInfo"
+	"github.com/blackfireio/osinfo"
 )
 
 func init() {
@@ -62,14 +62,14 @@ func checkNetworks() {
 }
 
 func checkMachines() {
-	gi, err := goInfo.GetInfo()
+	info, err := osinfo.GetOSInfo()
 	if err != nil {
-		panic(err)
+		fmt.Println("SKIP OS CHECK")
 		return
 	}
 
-	fmt.Println("GoOS:", gi.GoOS)
-	fmt.Println("Kernel:", gi.Kernel, gi.Core, gi.Platform)
-	//fmt.Println("OS:", gi.OS)
-	fmt.Println("Hostname:", gi.Hostname)
+	fmt.Printf("Family:       %v\n", info.Family)
+	fmt.Printf("Architecture: %v\n", info.Architecture)
+	fmt.Printf("OS:           %v\n", fmt.Sprintf("%s %s %s", info.ID, info.Name, info.Build))
+	fmt.Printf("Codename:     %v\n", info.Codename)
 }
