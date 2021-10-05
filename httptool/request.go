@@ -41,6 +41,7 @@ type HttpRequest struct {
 
 // ShowBody ... 打印请求 body
 func (r *HttpRequest) ShowBody() {
+	fmt.Println("request body:")
 	if r.BodyType == FILE {
 		body := io.Reader(r.Req.Body)
 		b, err := ioutil.ReadAll(body)
@@ -58,7 +59,7 @@ func (r *HttpRequest) ShowBody() {
 func (r *HttpRequest) ShowHeader() {
 	fmt.Println("request header:")
 	for key, value := range r.Req.Header {
-		if key != "code" {
+		if key != "Code" {
 			for _, v := range value {
 				fmt.Println(key + " : " + v)
 			}
