@@ -112,17 +112,17 @@ func NewRequest(method, url, body string, bodyType int) (req *HttpRequest, err e
 }
 
 // SendRequest ... 发送消息，根据状态码输出提示
-func SendRequest(request *HttpRequest) (*HttpResponse, error) {
+func (r *HttpRequest) SendRequest() (*HttpResponse, error) {
 	response := new(HttpResponse)
 	var err error
 	client := &http.Client{}
-	response.raw, err = client.Do(request.Req)
+	response.raw, err = client.Do(r.Req)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.raw.StatusCode == 200 {
-		err = ResolveResponse(response)
+		err = resolveResponse(response)
 		if err != nil {
 			return nil, err
 		}

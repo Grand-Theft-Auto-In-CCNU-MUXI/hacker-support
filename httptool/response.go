@@ -59,7 +59,7 @@ func (r *HttpResponse) GetHeader(key string) ([]string, error) {
 }
 
 // DownloadFile ... 下载文件
-func DownloadFile(r *HttpResponse, path string) (err error) {
+func (r *HttpResponse) Save(path string) (err error) {
 	if path == "" {
 		return errors.New("path is invalid")
 	}
@@ -79,7 +79,7 @@ func DownloadFile(r *HttpResponse, path string) (err error) {
 	return nil
 }
 
-func ResolveResponse(response *HttpResponse) (err error) {
+func resolveResponse(response *HttpResponse) (err error) {
 	body, err := ioutil.ReadAll(response.raw.Body)
 
 	defer func(Body io.ReadCloser) {
